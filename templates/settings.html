@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Paramètres - StockSheet Scan</title>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        :root {
+            --bg-body: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #1e293b);
+            --bg-container: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --card-bg: #f8fafc;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: linear-gradient(-45deg, #020617, #0f172a, #1e1b4b, #090d16);
+            --bg-container: rgba(15, 23, 42, 0.95);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            background-size: 400% 400%;
+            animation: gradientBG 18s ease infinite;
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px;
+            min-height: 100vh;
+            transition: color 0.4s ease;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: auto;
+            background: var(--bg-container);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+
+        .logo-text { font-size: 24px; font-weight: 800; color: var(--text-main); }
+        .logo-text span { color: #2563eb; font-style: italic; }
+        .back-link { color: #2563eb; text-decoration: none; font-weight: 700; font-size: 14px; transition: 0.2s; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Bouton Theme */
+        .btn-theme { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-main); transition: 0.2s; margin-right: 10px; }
+        .btn-theme:hover { background: var(--border-color); }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 11px 14px;
+            margin: 8px 0 15px 0;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: var(--input-bg);
+            color: var(--text-main);
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        button[type="submit"] {
+            padding: 12px 20px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        }
+
+        .flash {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 20px;
+            border: 1px solid #a7f3d0;
+        }
+
+        .status-box {
+            background-color: var(--card-bg);
+            padding: 18px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border-color);
+        }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-full { grid-column: span 2; }
+        
+        h3 { color: var(--text-main); font-size: 17px; margin-top: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-text">StockSheet <span>Scan</span> - Paramètres</div>
+            <div>
+                <button type="button" class="btn-theme" onclick="toggleTheme()" id="themeBtn">🌙 Mode Sombre</button>
+                <a href="/client" class="back-link">← Retour au Dashboard</a>
+            </div>
+        </div>
+
+        <div class="status-box">
+            <h3 style="margin-bottom: 5px;">État de votre abonnement</h3>
+            <p style="margin: 0; color: var(--text-muted);">Temps restant : <b style="color: #059669;">{{ time_left }}</b></p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" enctype="multipart/form-data">
+            
+            <h3>🔑 Activer un code d'abonnement</h3>
+            <input type="text" name="activation_code" placeholder="Ex: STK-12C7FBFE">
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 25px 0;">
+
+            <h3>🏢 Informations de votre Entreprise & Devise</h3>
+            
+            <div class="form-grid">
+                <div class="form-full">
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Nom de la Société</label>
+                    <input type="text" name="company_name" value="{{ current_user.company_name or '' }}" placeholder="Ex: Ma Société S.A.R.L">
+                </div>
+
+                <div class="form-full">
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Devise de l'entreprise</label>
+                    <select name="currency">
+                        <option value="DH" {% if current_user.currency == 'DH' %}selected{% endif %}>MAD / DH (Dirham marocain)</option>
+                        <option value="EUR" {% if current_user.currency == 'EUR' %}selected{% endif %}>EUR (€ - Euro)</option>
+                        <option value="USD" {% if current_user.currency == 'USD' %}selected{% endif %}>USD ($ - Dollar américain)</option>
+                        <option value="GBP" {% if current_user.currency == 'GBP' %}selected{% endif %}>GBP (£ - Livre sterling)</option>
+                        <option value="XOF" {% if current_user.currency == 'XOF' %}selected{% endif %}>XOF (Franc CFA)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">ICE</label>
+                    <input type="text" name="ice" value="{{ current_user.ice or '' }}" placeholder="Numéro ICE">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Identifiant Fiscal (IF)</label>
+                    <input type="text" name="if_tax" value="{{ current_user.if_tax or '' }}" placeholder="Numéro IF">
+                </div>
+
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Registre de Commerce (RC)</label>
+                    <input type="text" name="rc" value="{{ current_user.rc or '' }}" placeholder="Numéro RC">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Numéro de Téléphone</label>
+                    <input type="text" name="phone" value="{{ current_user.phone or '' }}" placeholder="Ex: +212 6...">
+                </div>
+
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">E-mail Professionnel</label>
+                    <input type="text" name="email" value="{{ current_user.email or '' }}" placeholder="contact@societe.com">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Site Web</label>
+                    <input type="text" name="website" value="{{ current_user.website or '' }}" placeholder="www.societe.com">
+                </div>
+
+                <div class="form-full">
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Adresse du Siège</label>
+                    <input type="text" name="address" value="{{ current_user.address or '' }}" placeholder="Boulevard Mohammed V, Casablanca">
+                </div>
+
+                <div class="form-full">
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 700;">Logo de l'entreprise (Image)</label>
+                    <input type="file" name="logo" accept="image/*">
+                    {% if current_user.logo_filename %}
+                        <p style="font-size: 12px; color: #059669; font-weight: 600;">Logo actuel enregistré ✅</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <button type="submit">Enregistrer les modifications</button>
+        </form>
+    </div>
+
+    <script>
+        // Gestion du Mode Clair / Mode Sombre synchronisé avec le choix du client
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeBtn = document.getElementById("themeBtn");
+            if (html.getAttribute("data-theme") === "light") {
+                html.setAttribute("data-theme", "dark");
+                themeBtn.innerHTML = "☀️ Mode Clair";
+                localStorage.setItem("theme", "dark");
+            } else {
+                html.setAttribute("data-theme", "light");
+                themeBtn.innerHTML = "🌙 Mode Sombre";
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            if (savedTheme === "dark") {
+                document.getElementById("themeBtn").innerHTML = "☀️ Mode Clair";
+            }
+        });
+    </script>
+</body>
+</html>

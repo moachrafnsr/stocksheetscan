@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription - StockSheet Scan</title>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #1e293b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: rgba(15, 23, 42, 0.92);
+            backdrop-filter: blur(12px);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-text { font-size: 26px; font-weight: 800; color: #ffffff; margin-bottom: 5px; }
+        .logo-text span { color: #60a5fa; font-style: italic; }
+
+        h3 { color: #94a3b8; font-size: 14px; margin-bottom: 25px; font-weight: 600; }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background: #1e293b;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+
+        /* Style de la case à cocher des conditions */
+        .terms-container {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-align: left;
+            margin: 15px 0 5px 0;
+            font-size: 12px;
+            color: #cbd5e1;
+        }
+        .terms-container input[type="checkbox"] {
+            margin-top: 3px;
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+        .terms-container a {
+            color: #60a5fa;
+            text-decoration: underline;
+            margin: 0;
+            font-size: 12px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+        }
+
+        .flash {
+            color: #f87171;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .login-link {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+        .login-link:hover { color: #ffffff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo-text">StockSheet <span>Scan</span></div>
+        <h3>Créer un compte (Profitez de 2 mois offerts 🎉)</h3>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Nom d'utilisateur / Entreprise" required>
+            <input type="password" name="password" placeholder="Mot de passe" required>
+            
+            <!-- CASE À COCHER CONDITIONS GÉNÉRALES -->
+            <div class="terms-container">
+                <input type="checkbox" id="terms" name="terms" required>
+                <label for="terms">
+                    J'accepte les <a href="/#mentions-legales" target="_blank">conditions générales d'utilisation</a> et la politique de confidentialité de <b>stocksheet.fr</b>.
+                </label>
+            </div>
+
+            <button type="submit">S'inscrire</button>
+        </form>
+        
+        <a href="/login" class="login-link">Déjà un compte ? Se connecter</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventaire - StockSheet Scan</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        /* Variables de couleurs pour Mode Clair & Mode Sombre */
+        :root {
+            --bg-body: #f3f4f6;
+            --bg-container: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --card-bg: #f8fafc;
+            --table-header: #f8fafc;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-container: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #0f172a;
+            --table-header: #1e293b;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 25px;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: auto;
+            background: var(--bg-container);
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .logo-area { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .logo-text { font-size: 24px; font-weight: 800; color: var(--text-main); }
+        .logo-text span { color: #2563eb; font-style: italic; }
+        
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; gap: 5px; }
+        .client-name-badge { background-color: rgba(37,99,235,0.1); color: #2563eb; border: 1px solid rgba(37,99,235,0.2); }
+        .currency-badge { background-color: rgba(245,158,11,0.1); color: #d97706; border: 1px solid rgba(245,158,11,0.2); }
+        .countdown-badge { background-color: rgba(16,185,129,0.1); color: #059669; border: 1px solid rgba(16,185,129,0.2); }
+
+        .nav-links { display: flex; gap: 10px; align-items: center; }
+        
+        /* Boutons d'en-tête */
+        .btn-header { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; cursor: pointer; border: none; transition: 0.2s ease; }
+        .btn-theme { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-theme:hover { background: var(--border-color); }
+        .btn-settings { background-color: #4b5563; color: white; }
+        .btn-settings:hover { background-color: #374151; transform: translateY(-1px); }
+        .logout { background-color: #dc2626; color: white; }
+        .logout:hover { background-color: #b91c1c; transform: translateY(-1px); }
+
+        .flash { background: #d1fae5; color: #065f46; padding: 12px; border-radius: 8px; font-weight: 600; font-size: 14px; margin-bottom: 20px; border: 1px solid #a7f3d0; animation: fadeIn 0.4s ease; }
+
+        /* Onglets */
+        .tabs { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; }
+        .tab-btn { padding: 9px 18px; background: var(--card-bg); color: var(--text-muted); text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 13px; border: 1px solid var(--border-color); transition: 0.2s ease; }
+        .tab-btn:hover { border-color: #2563eb; color: #2563eb; transform: translateY(-1px); }
+        .tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .tab-btn-add { background: #059669 !important; color: white !important; border: none !important; }
+        .tab-btn-add:hover { background: #047857 !important; }
+
+        /* Blocs sections */
+        .section-box { background: var(--card-bg); padding: 22px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border-color); transition: 0.3s ease; }
+        .section-box:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.04); }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 12px; align-items: end; }
+        input[type="text"], input[type="number"], input[type="file"] { padding: 11px; border: 1px solid var(--input-border); border-radius: 8px; width: 100%; box-sizing: border-box; background: var(--input-bg); color: var(--text-main); font-size: 14px; transition: 0.2s; }
+        input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+
+        button { padding: 11px 18px; background-color: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; transition: 0.2s ease; }
+        button:hover { background-color: #1d4ed8; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37,99,235,0.25); }
+
+        .search-bar input { width: 100%; padding: 12px; border: 1px solid var(--input-border); border-radius: 8px; font-size: 14px; background-color: var(--input-bg); color: var(--text-main); margin-bottom: 20px; transition: 0.2s; }
+
+        /* Tableau */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 14px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 14px; }
+        th { background-color: var(--table-header); color: var(--text-main); font-weight: 700; }
+        tr.product-row { transition: background-color 0.2s; }
+        tr.product-row:hover { background-color: rgba(37,99,235,0.03); }
+
+        .actions-bar { margin-top: 25px; display: flex; gap: 12px; }
+        .btn-excel { background-color: #059669; }
+        .btn-excel:hover { background-color: #047857; }
+        .btn-pdf { background-color: #dc2626; }
+        .btn-pdf:hover { background-color: #b91c1c; }
+        
+        #reader { width: 300px; margin: 15px 0; display: none; border-radius: 8px; overflow: hidden; border: 1px solid var(--border-color); }
+        
+        /* Modal */
+        #modal-comm { display: none; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); position: fixed; top:0; left:0; width:100%; height:100%; justify-content:center; align-items:center; z-index: 1000; animation: fadeIn 0.3s ease; }
+        .modal-content { background: var(--bg-container); padding: 35px; border-radius: 16px; width: 420px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); border: 1px solid var(--border-color); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo-area">
+                <div class="logo-text">StockSheet <span>Scan</span></div>
+                <div class="badge client-name-badge">👤 {{ current_user.company_name if current_user.company_name else current_user.username }}</div>
+                <div class="badge currency-badge">💱 {{ currency }}</div>
+                <div class="badge countdown-badge">⏳ {{ time_left }}</div>
+            </div>
+            <div class="nav-links">
+                <button type="button" class="btn-header btn-theme" onclick="toggleTheme()" id="themeBtn">🌙 Mode Sombre</button>
+                <a href="/client/settings" class="btn-header btn-settings">⚙️ Paramètres</a>
+                <a href="/logout" class="btn-header logout">Déconnexion</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- ONGLETS -->
+        <div class="tabs">
+            <a href="/client?tab=Principal" class="tab-btn {% if active_tab == 'Principal' %}active{% endif %}">📦 Stock Principal</a>
+            <a href="/client?tab=Depot" class="tab-btn {% if active_tab == 'Depot' %}active{% endif %}">🏢 Stock Dépôt</a>
+            
+            {% for comm in commercials %}
+                <a href="/client?tab=comm_{{ comm.id }}" class="tab-btn {% if active_tab == 'comm_' ~ comm.id %}active{% endif %}">🛒 {{ comm.name }} ({{ comm.zone }})</a>
+            {% endfor %}
+
+            <button type="button" onclick="openModal()" class="tab-btn tab-btn-add">+ Nouveau Commercial</button>
+        </div>
+
+        <h2 style="color: var(--text-main); margin-top: 0; font-size: 20px; font-weight: 700;">
+            {% if active_tab == 'Principal' %}Inventaire : Stock Principal
+            {% elif active_tab == 'Depot' %}Inventaire : Stock Dépôt
+            {% elif current_commercial %}Inventaire Commercial : {{ current_commercial.name }} (Tél: {{ current_commercial.phone }}, Zone: {{ current_commercial.zone }})
+            {% endif %}
+        </h2>
+
+        <!-- IMPORT EXCEL -->
+        <div class="section-box">
+            <h3 style="margin-top:0; color:var(--text-main); font-size: 16px;">📂 Importer un stock Excel</h3>
+            <form action="/client/import/excel" method="POST" enctype="multipart/form-data" style="display: flex; gap: 12px; align-items: center;">
+                <input type="hidden" name="inventory_type" value="{{ active_tab }}">
+                <input type="file" name="file" accept=".xlsx, .xls" required>
+                <button type="submit" style="background-color: #059669; white-space: nowrap;">Importer dans cet inventaire</button>
+            </form>
+        </div>
+
+        <!-- SAISIE & SCANNER -->
+        <div class="section-box">
+            <h3 style="margin-top:0; color:var(--text-main); font-size: 16px;">✍️ Ajouter un produit</h3>
+            <button type="button" onclick="toggleScanner()" style="background-color: #4f46e5; margin-bottom: 15px;">📷 Scanner un Code-Barres</button>
+            <div id="reader"></div>
+
+            <form action="/client/add" method="POST" class="form-grid">
+                <input type="hidden" name="inventory_type" value="{{ active_tab }}">
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Code-Barres / Ref</label>
+                    <input type="text" name="barcode" id="barcode-input" required placeholder="REF01">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Nom du Produit</label>
+                    <input type="text" name="name" required placeholder="Nom article">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Quantité</label>
+                    <input type="number" name="quantity" required placeholder="0">
+                </div>
+                <div>
+                    <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Prix Unitaire ({{ currency }})</label>
+                    <input type="number" step="0.01" name="price" required placeholder="0.00">
+                </div>
+                <div>
+                    <button type="submit">Ajouter</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- RECHERCHE -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="🔍 Rechercher dans cet inventaire...">
+        </div>
+
+        <!-- TABLEAU -->
+        <table id="inventoryTable">
+            <tr>
+                <th>Code-Barres</th>
+                <th>Désignation Produit</th>
+                <th>Quantité</th>
+                <th>Prix Unitaire ({{ currency }})</th>
+                <th>Valeur Totale ({{ currency }})</th>
+            </tr>
+            {% for p in products %}
+            <tr class="product-row">
+                <td class="col-barcode">{{ p.barcode }}</td>
+                <td class="col-name">{{ p.name }}</td>
+                <td><b>{{ p.quantity }}</b></td>
+                <td>{{ "%.2f"|format(p.price) }} {{ currency }}</td>
+                <td><b>{{ "%.2f"|format(p.quantity * p.price) }} {{ currency }}</b></td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted);">Aucun produit dans cet inventaire.</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- EXPORTS -->
+        <div class="actions-bar">
+            <a href="/client/export/excel/{{ active_tab }}"><button class="btn-excel" type="button">📥 Exporter en Excel</button></a>
+            <a href="/client/export/pdf/{{ active_tab }}"><button class="btn-pdf" type="button">📄 Télécharger PDF</button></a>
+        </div>
+    </div>
+
+    <!-- MODAL COMMERCIAL -->
+    <div id="modal-comm">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--text-main);">Ajouter un nouveau Commercial</h3>
+            <form action="/client/add_commercial" method="POST">
+                <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Nom et Prénom</label>
+                <input type="text" name="name" required placeholder="Ex: Mohamed Alami" style="margin-bottom:12px;">
+                
+                <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Téléphone / Coordonnées</label>
+                <input type="text" name="phone" placeholder="Ex: 0600000000" style="margin-bottom:12px;">
+
+                <label style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Zone / Ville</label>
+                <input type="text" name="zone" placeholder="Ex: Casablanca" style="margin-bottom:20px;">
+
+                <div style="display:flex; gap:10px;">
+                    <button type="submit" style="flex:1;">Créer l'inventaire</button>
+                    <button type="button" onclick="closeModal()" style="background-color: #64748b; flex:1;">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Gestion du Mode Clair / Mode Sombre
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeBtn = document.getElementById("themeBtn");
+            if (html.getAttribute("data-theme") === "light") {
+                html.setAttribute("data-theme", "dark");
+                themeBtn.innerHTML = "☀️ Mode Clair";
+                localStorage.setItem("theme", "dark");
+            } else {
+                html.setAttribute("data-theme", "light");
+                themeBtn.innerHTML = "🌙 Mode Sombre";
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        // Sauvegarde de la préférence de thème
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            if (savedTheme === "dark") {
+                document.getElementById("themeBtn").innerHTML = "☀️ Mode Clair";
+            }
+        });
+
+        function openModal() { document.getElementById("modal-comm").style.display = "flex"; }
+        function closeModal() { document.getElementById("modal-comm").style.display = "none"; }
+
+        let html5QrCode;
+        function toggleScanner() {
+            const readerDiv = document.getElementById("reader");
+            if (readerDiv.style.display === "block") {
+                readerDiv.style.display = "none";
+                if(html5QrCode) html5QrCode.stop();
+            } else {
+                readerDiv.style.display = "block";
+                html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 10, qrbox: { width: 250, height: 100 } },
+                    (decodedText, decodedResult) => {
+                        document.getElementById("barcode-input").value = decodedText;
+                        document.getElementById("searchInput").value = decodedText;
+                        filterTable();
+                        html5QrCode.stop();
+                        readerDiv.style.display = "none";
+                    },
+                    (errorMessage) => {}
+                ).catch(err => { alert("Erreur caméra : " + err); });
+            }
+        }
+
+        function filterTable() {
+            let input = document.getElementById("searchInput");
+            let filter = input.value.toLowerCase();
+            let rows = document.getElementsByClassName("product-row");
+
+            for (let i = 0; i < rows.length; i++) {
+                let barcodeText = rows[i].getElementsByClassName("col-barcode")[0].innerText.toLowerCase();
+                let nameText = rows[i].getElementsByClassName("col-name")[0].innerText.toLowerCase();
+
+                if (barcodeText.includes(filter) || nameText.includes(filter)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>StockSheet Scan - Pilotez vos performances par la donnée</title>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        :root {
+            --bg-body: #ffffff;
+            --bg-section: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --card-bg: #ffffff;
+            --card-border: #e2e8f0;
+            --nav-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #090d16;
+            --bg-section: #0f172a;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --nav-bg: rgba(15, 23, 42, 0.9);
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            margin: 0;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        
+        /* NAVBAR */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            width: 100%;
+            box-sizing: border-box;
+            position: sticky;
+            top: 0;
+            background: var(--nav-bg);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--card-border);
+            transition: 0.4s;
+        }
+        .logo { font-size: 22px; font-weight: 800; color: var(--text-main); text-decoration: none; }
+        .logo span { color: #60a5fa; font-style: italic; }
+        
+        .nav-right { display: flex; gap: 12px; align-items: center; }
+        .btn-theme { padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; border: 1px solid var(--card-border); background: var(--card-bg); color: var(--text-main); transition: 0.2s; }
+        .btn-theme:hover { transform: translateY(-2px); }
+
+        .btn-nav-login { padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; color: var(--text-main); border: 1px solid var(--card-border); transition: 0.2s; }
+        .btn-nav-login:hover { background: var(--card-border); }
+        .btn-nav-reg { padding: 8px 18px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; color: white; background: #2563eb; transition: 0.2s; box-shadow: 0 4px 12px rgba(37,99,235,0.3); }
+        .btn-nav-reg:hover { background: #1d4ed8; transform: translateY(-2px); }
+
+        /* HERO SECTION */
+        .hero {
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #1e293b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            color: white;
+            padding: 100px 20px 130px 20px;
+            text-align: center;
+        }
+        .hero h1 { font-size: 52px; font-weight: 800; margin-bottom: 20px; letter-spacing: -0.5px; animation: fadeIn 0.8s ease; }
+        .hero p { font-size: 18px; color: #cbd5e1; max-width: 650px; margin: 0 auto 25px auto; animation: fadeIn 1s ease; }
+        
+        .badge-free-offer { background: #10b981; color: white; padding: 6px 16px; border-radius: 30px; font-size: 14px; font-weight: 700; display: inline-block; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(16,185,129,0.4); }
+
+        .hero-cta { display: flex; justify-content: center; gap: 15px; animation: fadeIn 1.2s ease; }
+        .btn-hero-white { background: white; color: #0f172a; padding: 14px 28px; border-radius: 10px; font-weight: 700; text-decoration: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .btn-hero-white:hover { background: #f1f5f9; transform: translateY(-3px); }
+        .btn-hero-outline { background: transparent; color: white; border: 2px solid rgba(255,255,255,0.4); padding: 14px 28px; border-radius: 10px; font-weight: 700; text-decoration: none; transition: 0.3s; }
+        .btn-hero-outline:hover { border-color: white; background: rgba(255,255,255,0.1); transform: translateY(-3px); }
+
+        /* SECTIONS */
+        .section { padding: 90px 20px; max-width: 1100px; margin: auto; text-align: center; }
+        .section-title { font-size: 34px; font-weight: 800; color: var(--text-main); margin-bottom: 15px; }
+        .section-desc { font-size: 16px; color: var(--text-muted); max-width: 600px; margin: 0 auto 55px auto; }
+
+        /* TARGETS */
+        .target-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; text-align: left; }
+        .target-card { background: var(--card-bg); padding: 35px; border-radius: 14px; border: 1px solid var(--card-border); box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+        .target-card:hover { transform: translateY(-8px); border-color: #2563eb; box-shadow: 0 15px 35px rgba(37,99,235,0.1); }
+        .target-card h3 { font-size: 19px; color: var(--text-main); margin-top: 0; margin-bottom: 12px; }
+        .target-card p { font-size: 14px; color: var(--text-muted); margin: 0; }
+
+        /* PRICING */
+        .pricing-wrapper { background: var(--bg-section); max-width: 100%; padding: 90px 20px; transition: 0.4s; }
+        .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: left; max-width: 1100px; margin: auto; }
+        .pricing-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 35px 25px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 10px 30px rgba(0,0,0,0.03); transition: all 0.3s ease; position: relative; }
+        .pricing-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); border-color: #2563eb; }
+        .pricing-card.featured { border: 2px solid #2563eb; transform: scale(1.03); }
+        .pricing-card.featured:hover { transform: scale(1.03) translateY(-8px); }
+        
+        .badge-popular { position: absolute; top: -14px; right: 20px; background: #2563eb; color: white; font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 20px; text-transform: uppercase; }
+        
+        .plan-duration { font-size: 15px; font-weight: 700; color: var(--text-muted); }
+        .plan-price { font-size: 38px; font-weight: 800; color: var(--text-main); margin: 15px 0; }
+        .plan-price span { font-size: 16px; font-weight: normal; color: var(--text-muted); }
+        .plan-features { font-size: 13px; color: var(--text-muted); margin-bottom: 30px; list-style: none; padding: 0; }
+        .plan-features li { margin-bottom: 10px; }
+        
+        .btn-pricing { display: block; text-align: center; background: #0f172a; color: white; padding: 12px; border-radius: 8px; font-weight: 700; text-decoration: none; transition: 0.2s; }
+        .btn-pricing:hover { background: #2563eb; transform: translateY(-2px); }
+
+        /* CADRE DES 5 LOGOS OFFICIELS AVEC LES VRAIES IMAGES OFFICIELLES (VISA, MASTERCARD, AMEX, APPLE PAY, GOOGLE PAY) */
+        .payment-logos-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 30px;
+            margin: 40px auto 0 auto;
+            max-width: 1050px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+        .payment-logos-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 22px;
+        }
+        .payment-images-grid {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .pay-img-box {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            transition: 0.2s;
+        }
+        .pay-img-box:hover {
+            transform: translateY(-2px);
+            border-color: #2563eb;
+            box-shadow: 0 6px 15px rgba(37,99,235,0.1);
+        }
+        .pay-img-box img {
+            height: 26px;
+            object-fit: contain;
+        }
+
+        .payment-info { background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.2); border-radius: 14px; padding: 30px; margin: 30px auto 0 auto; max-width: 1050px; text-align: left; font-size: 14px; color: var(--text-main); }
+        .payment-info b { color: #2563eb; }
+
+        /* MENTIONS LÉGALES */
+        .legal-section { background: var(--card-bg); border-top: 1px solid var(--card-border); padding: 70px 20px; text-align: left; transition: 0.4s; }
+        .legal-container { max-width: 1000px; margin: auto; }
+        .legal-section h3 { font-size: 20px; font-weight: 800; color: var(--text-main); margin-bottom: 15px; }
+        .legal-section p, .legal-section li { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
+        .legal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px; }
+
+        /* FOOTER */
+        footer { background: #070b14; color: #94a3b8; text-align: center; padding: 40px 20px; font-size: 14px; }
+        footer span { color: white; font-weight: bold; }
+
+        @media(max-width: 900px) {
+            .target-grid, .pricing-grid, .legal-grid { grid-template-columns: 1fr; }
+            .pricing-card.featured { transform: none; }
+            nav { padding: 15px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <a href="/" class="logo">StockSheet <span>Scan</span></a>
+        <div class="nav-right">
+            <button type="button" class="btn-theme" onclick="toggleTheme()" id="themeBtn">🌙 Mode Sombre</button>
+            <a href="/login" class="btn-nav-login">Se connecter</a>
+            <a href="/register" class="btn-nav-reg">S'inscrire</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <div class="hero">
+        <div class="badge-free-offer">🎁 2 mois d'essai gratuit offerts à l'inscription !</div>
+        <h1>Pilotez vos performances par la donnée.</h1>
+        <p>StockSheet Scan est l'application ultime de gestion d'inventaire physique, multi-dépôts et par commerciaux, propulsée par <strong>stocksheet.fr</strong>.</p>
+        <div class="hero-cta">
+            <a href="/register" class="btn-hero-white">Créer mon compte gratuit</a>
+            <a href="#pricing" class="btn-hero-outline">Voir nos tarifs</a>
+        </div>
+    </div>
+
+    <!-- NOTRE SAAS & À QUI IL EST DESTINÉ -->
+    <div class="section">
+        <h2 class="section-title">À qui s'adresse StockSheet Scan ?</h2>
+        <p class="section-desc">Une solution sur-mesure conçue pour simplifier la logistique et le suivi commercial de votre structure.</p>
+        
+        <div class="target-grid">
+            <div class="target-card">
+                <h3>🏢 PME & Entreprises</h3>
+                <p>Idéal pour centraliser l'inventaire principal de votre entrepôt, suivre les entrées, sorties et valoriser vos stocks en toute simplicité.</p>
+            </div>
+            <div class="target-card">
+                <h3>📦 Gestion multi-dépôts</h3>
+                <p>Gérez distinctement votre stock principal et vos différents dépôts de stockage de manière cloisonnée et claire.</p>
+            </div>
+            <div class="target-card">
+                <h3>🛒 Équipes Commerciales</h3>
+                <p>Attribuez des stocks spécifiques à chaque commercial avec ses propres coordonnées (zone, téléphone) et suivez leurs performances terrain.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TARIFS & ABONNEMENTS -->
+    <div class="pricing-wrapper" id="pricing">
+        <div style="max-width: 1100px; margin: auto; text-align: center;">
+            <h2 class="section-title">Nos Tarifs d'Abonnement</h2>
+            <p class="section-desc">Profitez de 2 mois offerts à l'inscription, puis choisissez la formule de votre choix.</p>
+
+            <div class="pricing-grid">
+                <!-- 1 MOIS -->
+                <div class="pricing-card">
+                    <div>
+                        <div class="plan-duration">Formule 1 Mois</div>
+                        <div class="plan-price">2€ <span>/mois</span></div>
+                        <ul class="plan-features">
+                            <li>✔ Accès complet à l'app</li>
+                            <li>✔ Scan code-barres caméra</li>
+                            <li>✔ Exports Excel & PDF pro</li>
+                        </ul>
+                    </div>
+                    <a href="https://bunq.me/MANasrEddine?amount=2&description=StockSheet.fr+1+mois" target="_blank" class="btn-pricing">Payer 2€</a>
+                </div>
+
+                <!-- 3 MOIS -->
+                <div class="pricing-card">
+                    <div>
+                        <div class="plan-duration">Formule 3 Mois</div>
+                        <div class="plan-price">5€</div>
+                        <ul class="plan-features">
+                            <li>✔ Accès complet à l'app</li>
+                            <li>✔ Multi-commerciaux & Dépôts</li>
+                            <li>✔ Support prioritaire</li>
+                        </ul>
+                    </div>
+                    <a href="https://bunq.me/MANasrEddine?amount=5&description=StockSheet.fr+3+mois" target="_blank" class="btn-pricing">Payer 5€</a>
+                </div>
+
+                <!-- 6 MOIS -->
+                <div class="pricing-card featured">
+                    <div class="badge-popular">Populaire</div>
+                    <div>
+                        <div class="plan-duration">Formule 6 Mois</div>
+                        <div class="plan-price">8€</div>
+                        <ul class="plan-features">
+                            <li>✔ Toutes les fonctionnalités</li>
+                            <li>✔ Mises à jour incluses</li>
+                            <li>✔ Idéal pour semi-annuel</li>
+                        </ul>
+                    </div>
+                    <a href="https://bunq.me/MANasrEddine?amount=8&description=StockSheet.fr+6+mois" target="_blank" class="btn-pricing">Payer 8€</a>
+                </div>
+
+                <!-- 12 MOIS -->
+                <div class="pricing-card">
+                    <div>
+                        <div class="plan-duration">Formule 1 An (12 mois)</div>
+                        <div class="plan-price">12€</div>
+                        <ul class="plan-features">
+                            <li>✔ Rentabilité maximale</li>
+                            <li>✔ Accès illimité 1 an</li>
+                            <li>✔ Accompagnement VIP</li>
+                        </ul>
+                    </div>
+                    <a href="https://bunq.me/MANasrEddine?amount=12&description=StockSheet.fr+12+mois" target="_blank" class="btn-pricing">Payer 12€</a>
+                </div>
+            </div>
+
+            <!-- CADRE UNIQUE AVEC LES 5 VRAIS LOGOS OFFICIELS (VISA, MASTERCARD, AMEX, APPLE PAY, GOOGLE PAY) -->
+            <div class="payment-logos-container">
+                <div class="payment-logos-title">Moyens de paiement acceptés & sécurisés</div>
+                <div class="payment-images-grid">
+                    <div class="pay-img-box"><img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/visa.svg" alt="Visa"></div>
+                    <div class="pay-img-box"><img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/mastercard.svg" alt="Mastercard"></div>
+                    <div class="pay-img-box"><img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/americanexpress.svg" alt="Amex"></div>
+                    <div class="pay-img-box"><img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/applepay.svg" alt="Apple Pay"></div>
+                    <div class="pay-img-box"><img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/googlepay.svg" alt="Google Pay"></div>
+                </div>
+            </div>
+
+            <!-- INSTRUCTION VALIDATION PAIEMENT -->
+            <div class="payment-info">
+                <b>📌 Comment activer votre compte après le paiement ?</b><br>
+                1. Profitez immédiatement de vos <b>2 mois d'essai gratuit</b> en créant votre compte !<br>
+                2. Pour prolonger, cliquez sur le bouton de la formule souhaitée pour régler de manière sécurisée (Visa, Mastercard, Amex, Apple Pay, Google Pay) via notre lien Bunq.<br>
+                3. Envoyez-nous un e-mail à : <b>contact.stocksheet.fr@gmail.com</b> avec la <b>capture d'écran de votre paiement</b> et votre <b>nom d'utilisateur (username)</b> enregistré sur <b>stocksheet.fr</b>.<br>
+                4. Votre licence sera activée manuellement dans les plus brefs délais !
+            </div>
+        </div>
+    </div>
+
+    <!-- MENTIONS LÉGALES -->
+    <div class="legal-section" id="mentions-legales">
+        <div class="legal-container">
+            <h2 class="section-title" style="text-align: left; font-size: 26px; margin-bottom: 10px;">Mentions Légales & Conditions</h2>
+            <p style="color: var(--text-muted); margin-bottom: 30px;">Informations officielles relatives à l'exploitation de la plateforme StockSheet Scan.</p>
+
+            <div class="legal-grid">
+                <div>
+                    <h3>1. Édition et Propriété du Service</h3>
+                    <p>La plateforme <b>StockSheet Scan</b> est un service en ligne (SaaS) édité et rattaché officiellement au site web <b>stocksheet.fr</b>.<br>
+                    Contact officiel du support : <b>contact.stocksheet.fr@gmail.com</b></p>
+
+                    <h3 style="margin-top: 25px;">2. Clause de Non-Responsabilité</h3>
+                    <p><b>StockSheet Scan</b> met à disposition un outil technique de gestion d'inventaire, de codes-barres et de valorisation financière. L'éditeur ne peut en aucun cas être tenu responsable des erreurs de saisie, des écarts d'inventaire physiques, ou d'éventuelles pertes ou fuites de données imputables à l'utilisateur. L'entreprise utilisatrice demeure seule responsable de l'exactitude de ses données.</p>
+                </div>
+                <div>
+                    <h3>3. Données Personnelles et Confidentialité</h3>
+                    <p>Les données renseignées par les clients (références produits, prix, informations d'entreprise et logos) sont stockées de manière sécurisée et ne sont en aucun cas revendues ou partagées avec des tiers. Chaque utilisateur conserve l'entière propriété intellectuelle et la gestion de ses données.</p>
+
+                    <h3 style="margin-top: 25px;">4. Conditions d'Abonnement et Essai</h3>
+                    <p>Chaque nouvel utilisateur bénéficie automatiquement de <b>2 mois d'essai gratuit</b> à l'inscription. Au-delà, l'accès à la plateforme requiert l'acquisition d'une licence payante via les tarifs en vigueur. Les paiements s'effectuent par les canaux officiels indiqués suivis de la validation manuelle sur justificatif.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER OFFICIEL -->
+    <footer>
+        <p>© 2026 <span>stocksheet.fr</span> — Tous droits réservés.</p>
+        <p style="font-size: 13px; color: #64748b; margin-top: 5px;">StockSheet Scan est une application officielle éditée et rattachée à <b>stocksheet.fr</b>.</p>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">Contact support : <b>contact.stocksheet.fr@gmail.com</b></p>
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeBtn = document.getElementById("themeBtn");
+            if (html.getAttribute("data-theme") === "light") {
+                html.setAttribute("data-theme", "dark");
+                themeBtn.innerHTML = "☀️ Mode Clair";
+                localStorage.setItem("theme", "dark");
+            } else {
+                html.setAttribute("data-theme", "light");
+                themeBtn.innerHTML = "🌙 Mode Sombre";
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            if (savedTheme === "dark") {
+                document.getElementById("themeBtn").innerHTML = "☀️ Mode Clair";
+            }
+        });
+    </script>
+</body>
+</html>

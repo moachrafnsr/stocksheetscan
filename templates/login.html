@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion - StockSheet Scan</title>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #1e293b);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo-text { font-size: 26px; font-weight: 800; color: #ffffff; margin-bottom: 25px; }
+        .logo-text span { color: #60a5fa; font-style: italic; }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            background: #1e293b;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+        }
+
+        .flash {
+            color: #f87171;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        a {
+            color: #60a5fa;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+
+        a:hover { color: #ffffff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="logo-text">StockSheet <span>Scan</span></div>
+        
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <input type="text" name="username" placeholder="Nom d'utilisateur" required>
+            <input type="password" name="password" placeholder="Mot de passe" required>
+            <button type="submit">Se connecter</button>
+        </form>
+        <a href="/register">Pas encore de compte ? S'inscrire</a>
+    </div>
+</body>
+</html>

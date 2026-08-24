@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <title>Administration - StockSheet Scan</title>
+    <style>
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        :root {
+            --bg-body: linear-gradient(-45deg, #0f172a, #1e3a8a, #2563eb, #1e293b);
+            --bg-container: rgba(255, 255, 255, 0.96);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --card-bg: #f8fafc;
+            --table-header: #f1f5f9;
+            --input-bg: #ffffff;
+            --input-border: #cbd5e1;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: linear-gradient(-45deg, #020617, #0f172a, #1e1b4b, #090d16);
+            --bg-container: rgba(15, 23, 42, 0.96);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --card-bg: #1e293b;
+            --table-header: #0f172a;
+            --input-bg: #1e293b;
+            --input-border: #475569;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-body);
+            background-size: 400% 400%;
+            animation: gradientBG 18s ease infinite;
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px;
+            min-height: 100vh;
+            transition: color 0.4s ease;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: var(--bg-container);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            animation: fadeIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            border: 1px solid var(--border-color);
+        }
+
+        h1, h3 { color: var(--text-main); }
+        p { color: var(--text-muted); }
+
+        /* KPI STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 28px;
+            font-weight: 800;
+            color: #2563eb;
+            margin-top: 5px;
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid var(--border-color); text-align: left; font-size: 14px; color: var(--text-main); }
+        th { background-color: var(--table-header); color: var(--text-main); font-weight: 700; }
+        
+        button, select, input { padding: 9px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; }
+        button { background-color: #2563eb; color: white; border: none; transition: 0.2s; }
+        button:hover { background-color: #1d4ed8; transform: translateY(-1px); }
+        
+        select, input[type="text"], input[type="password"] {
+            background-color: var(--input-bg);
+            color: var(--text-main);
+            border: 1px solid var(--input-border);
+        }
+
+        .nav-admin { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-theme { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); }
+        .logout { background-color: #dc2626; text-decoration: none; padding: 8px 16px; color: white; border-radius: 8px; font-weight: bold; }
+        .logout:hover { background-color: #b91c1c; }
+
+        .flash { color: #065f46; background: #d1fae5; border: 1px solid #a7f3d0; font-weight: 600; font-size: 14px; padding: 12px; border-radius: 8px; margin-bottom: 20px; }
+        
+        .btn-success { background-color: #059669; padding: 6px 12px; font-size: 12px; }
+        .btn-warning { background-color: #d97706; padding: 6px 12px; font-size: 12px; }
+        .btn-danger { background-color: #dc2626; padding: 6px 12px; font-size: 12px; }
+        
+        .input-inline { padding: 7px; width: 120px; font-size: 13px; }
+        .section-box { background: var(--card-bg); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); margin-top: 25px; }
+
+        @media(max-width: 900px) {
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="nav-admin">
+            <h2 style="margin: 0; color: #2563eb;">StockSheet <span>Scan</span> — Admin Superuser</h2>
+            <div>
+                <button type="button" class="btn-theme" onclick="toggleTheme()" id="themeBtn">🌙 Mode Sombre</button>
+                <a href="/logout" class="logout">Déconnexion</a>
+            </div>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="flash">{{ messages[0] }}</div>
+          {% endif %}
+        {% endwith %}
+
+        <!-- DASHBOARD STATS -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div>Total Clients Inscrits</div>
+                <div class="number">{{ total_clients }}</div>
+            </div>
+            <div class="stat-card">
+                <div>Clients Actifs (Licence OK)</div>
+                <div class="number" style="color: #059669;">{{ active_clients }}</div>
+            </div>
+            <div class="stat-card">
+                <div>Codes Générés</div>
+                <div class="number">{{ total_codes }}</div>
+            </div>
+            <div class="stat-card">
+                <div>Codes Disponibles</div>
+                <div class="number" style="color: #d97706;">{{ unused_codes }}</div>
+            </div>
+        </div>
+
+        <!-- SÉCURITÉ : CHANGER LE MDP ADMIN -->
+        <div class="section-box">
+            <h3 style="margin-top: 0;">🔐 Sécurité Superuser (Changer votre mot de passe Admin)</h3>
+            <form action="/admin/change_password" method="POST" style="display: flex; gap: 12px; align-items: center; max-width: 500px;">
+                <input type="password" name="new_password" placeholder="Nouveau mot de passe admin" required style="flex: 1;">
+                <button type="submit">Mettre à jour</button>
+            </form>
+        </div>
+
+        <!-- GÉNÉRATION DE CODES -->
+        <div class="section-box">
+            <h3 style="margin-top: 0;">🎟️ Générer un Code d'Abonnement</h3>
+            <form action="/admin/generate" method="POST" style="display: flex; align-items: center; gap: 15px;">
+                <select name="duration">
+                    <option value="1">1 Mois</option>
+                    <option value="3">3 Mois</option>
+                    <option value="6">6 Mois</option>
+                    <option value="12">1 An (12 Mois)</option>
+                </select>
+                <button type="submit">Générer le Code</button>
+            </form>
+        </div>
+
+        <!-- LISTE DES CODES -->
+        <h3>Codes d'activation & Attribution</h3>
+        <table>
+            <tr>
+                <th>Code</th>
+                <th>Durée</th>
+                <th>Statut</th>
+                <th>Utilisé par (Client)</th>
+                <th>Action</th>
+            </tr>
+            {% for c in codes %}
+            <tr>
+                <td><b>{{ c.code }}</b></td>
+                <td>{{ c.duration_months }} mois</td>
+                <td>
+                    <span style="color: {% if c.is_used %}#dc2626{% else %}#059669{% endif %}; font-weight: bold;">
+                        {{ "Utilisé" if c.is_used else "Disponible" }}
+                    </span>
+                </td>
+                <td><span style="font-weight: bold;">{{ c.used_by }}</span></td>
+                <td>
+                    <form action="/admin/code/delete/{{ c.id }}" method="POST" onsubmit="return confirm('Supprimer ce code ?');">
+                        <button type="submit" class="btn-danger">Supprimer</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-muted);">Aucun code généré.</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <!-- GESTION DES CLIENTS -->
+        <h3>Gestion des Comptes Clients & Licences</h3>
+        <table>
+            <tr>
+                <th>Nom d'utilisateur / Société</th>
+                <th>Expiration Abonnement</th>
+                <th>Changer mot de passe</th>
+                <th>Actions de Licence / Compte</th>
+            </tr>
+            {% for client in clients %}
+            <tr>
+                <td><b>{{ client.username }}</b> {% if client.company_name %}<span style="color:var(--text-muted); font-size:12px;">({{ client.company_name }})</span>{% endif %}</td>
+                <td>
+                    <span style="color: {% if client.expiry_date and client.expiry_date > now %}#059669{% else %}#dc2626{% endif %}; font-weight: bold;">
+                        {{ client.expiry_date.strftime('%d/%m/%Y à %H:%M') if client.expiry_date and client.expiry_date > now else 'Expiré / Inactif' }}
+                    </span>
+                </td>
+                <td>
+                    <form action="/admin/client/update/{{ client.id }}" method="POST" style="display:inline; display: flex; gap: 5px;">
+                        <input type="text" name="password" placeholder="Nouveau MDP" class="input-inline" required>
+                        <button type="submit" style="padding: 6px 10px; font-size: 12px;">OK</button>
+                    </form>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                        <form action="/admin/client/reactivate/{{ client.id }}" method="POST" onsubmit="return confirm('Réactiver la licence de ce client pour 1 mois ?');">
+                            <button type="submit" class="btn-success">+1 Mois</button>
+                        </form>
+                        <form action="/admin/client/suspend/{{ client.id }}" method="POST" onsubmit="return confirm('Voulez-vous suspendre la licence de ce client ?');">
+                            <button type="submit" class="btn-warning">Suspendre</button>
+                        </form>
+                        <form action="/admin/client/delete/{{ client.id }}" method="POST" onsubmit="return confirm('Supprimer définitivement ce client et toutes ses données de stock ?');">
+                            <button type="submit" class="btn-danger">Supprimer</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center; color: var(--text-muted);">Aucun client inscrit pour le moment.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeBtn = document.getElementById("themeBtn");
+            if (html.getAttribute("data-theme") === "light") {
+                html.setAttribute("data-theme", "dark");
+                themeBtn.innerHTML = "☀️ Mode Clair";
+                localStorage.setItem("theme", "dark");
+            } else {
+                html.setAttribute("data-theme", "light");
+                themeBtn.innerHTML = "🌙 Mode Sombre";
+                localStorage.setItem("theme", "dark"); // Correction persistance
+                localStorage.setItem("theme", "light");
+            }
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            const savedTheme = localStorage.getItem("theme") || "light";
+            document.documentElement.setAttribute("data-theme", savedTheme);
+            if (savedTheme === "dark") {
+                document.getElementById("themeBtn").innerHTML = "☀️ Mode Clair";
+            }
+        });
+    </script>
+</body>
+</html>
